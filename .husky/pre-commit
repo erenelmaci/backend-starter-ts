@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running linting and formatting checks..."
+yarn lint-staged
+
+echo "🔨 Running TypeScript compilation check..."
+yarn type-check
+
+echo "🏗️ Building project..."
+yarn build
+
+# If any of the previous commands fail, the commit will be aborted
+if [ $? -ne 0 ]; then
+  echo "❌ Commit failed. Please fix the errors."
+  exit 1
+fi
+
+echo "✅ All checks passed, proceeding with commit..."
