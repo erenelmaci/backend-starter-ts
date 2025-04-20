@@ -1,6 +1,14 @@
 import systemSettings from './systemSettings';
 
 const CONSTANTS = {
+  SYSTEM_LANGUAGES: {
+    EN: 'en',
+    TR: 'tr',
+    DE: 'de',
+    ES: 'es',
+    FR: 'fr',
+    IT: 'it',
+  },
   USER_ROLES: {
     ADMIN: 'admin',
     USER: 'user',

@@ -1,6 +1,6 @@
 - swagger yazılacak
 - model based automatically cronjob yazılacak
-- i18n yazılacak
+<!-- - i18n yazılacak -->
 - logger için db işlemi yapılacak
 - jest altyapısı kurulacak
 - basic modeller oluşturulacak

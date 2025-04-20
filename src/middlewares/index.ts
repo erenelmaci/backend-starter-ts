@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
+import { i18nMiddleware } from './i18n';
 
 const middlewares = [
   // Güvenlik başlıkları
@@ -17,6 +18,8 @@ const middlewares = [
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
   },
+
+  // i18nMiddleware,
 ];
 
 export default middlewares;

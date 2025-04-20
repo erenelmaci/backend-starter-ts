@@ -1,8 +1,8 @@
 /* *******************************************************
- * NODEJS PROJECT © 2024 - ITOPIATECH.COM.TR *
+ * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
-const { Schema, Model, models, model } = require('./mongoose');
+import mongoose, { Schema, Model, Document } from 'mongoose';
 
 /* -------------------------------------------------- */
 
@@ -12,27 +12,45 @@ interface ModelIndex {
   options?: Record<string, any>;
 }
 
-class BaseModel {
+// Base document interface
+export interface IBaseDocument extends Document {
+  notes?: string;
+  sortNumber?: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+  createdByUserId: mongoose.Types.ObjectId | string;
+  updatedByUserId?: mongoose.Types.ObjectId | string;
+  deletedByUserId?: mongoose.Types.ObjectId | string;
+  canUpdate: boolean;
+  canDelete: boolean;
+  isExists: boolean;
+}
+
+abstract class BaseModel<T extends IBaseDocument> {
   // ------------------------------
   // MODEL:
   // ------------------------------
   protected ObjectId: typeof Schema.Types.ObjectId;
-  protected Model: typeof Model;
-  protected name?: string;
-  protected table?: string;
-  protected fields?: Record<string, any>;
+  public Model!: Model<T>;
+  protected abstract name: string;
+  protected abstract table: string;
+  protected abstract fields: Record<string, any>;
   protected indexes?: ModelIndex[];
+  protected searchs?: string[];
 
   constructor() {
     this.ObjectId = Schema.Types.ObjectId;
+    // this.initModel();
   }
 
-  run(): this {
-    this.Model = models[this.name as string] || model(this.name as string, this.ModelSchema());
-    return this;
+  public initModel(): void {
+    const schema = this.ModelSchema();
+    this.Model = (mongoose.models[this.name] as Model<T>) || mongoose.model<T>(this.name, schema);
   }
 
-  protected ModelSchema(): typeof Schema {
+  protected ModelSchema(): Schema {
     const schema = new Schema(
       {
         ...this.fields,
@@ -48,11 +66,7 @@ class BaseModel {
       },
       {
         collection: this.table,
-        timestamps: {
-          createdAt: 'createdAtDate',
-          updatedAt: 'updatedAtDate',
-          deletedAt: 'deletedAtDate',
-        },
+        timestamps: true,
         id: false,
       },
     );

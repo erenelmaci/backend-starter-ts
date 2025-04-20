@@ -24,7 +24,7 @@ interface ErrorData {
 // CONSTANTS.ERRORS için tip tanımı
 type ErrorCode = keyof typeof CONSTANTS.ERRORS;
 
-const errorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
+const ErrorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
   let errorData: ErrorData = {
     error: true,
     method: req.method,
@@ -63,4 +63,4 @@ const errorHandler = (err: CustomError, req: Request, res: Response, next: NextF
   return res.status(errorData.status || 500).send(errorData);
 };
 
-export default errorHandler;
+export default ErrorHandler;

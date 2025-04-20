@@ -1,5 +1,5 @@
 /* *******************************************************
- * NODEJS PROJECT © 2024 - ITOPIATECH.COM.TR *
+ * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
 import mongoose from './mongoose';
@@ -17,9 +17,9 @@ export const connectToMongoDB = async (): Promise<void> => {
       throw new Error('MONGO_URI environment variable is not defined');
     }
     await mongoose.connect(mongoURI);
-    console.log('MongoDB connected');
+    console.log('\x1b[34m', 'MongoDB connected');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('\x1b[31m', 'MongoDB connection error:', error);
     process.exit(1);
   }
 };

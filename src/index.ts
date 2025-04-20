@@ -1,5 +1,5 @@
 /* *******************************************************
- * NODEJS PROJECT © 2024 - ITOPIATECH.COM.TR *
+ * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
 import express, { Request, Response, NextFunction } from 'express';
@@ -11,13 +11,19 @@ dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
 });
 
-console.log('Environment:', process.env.NODE_ENV);
+console.log('\x1b[32m%s\x1b[0m', 'Environment:', process.env.NODE_ENV);
+console.log(
+  '\x1b[32m%s\x1b[0m',
+  'ENV File:',
+  process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
+);
 
 // Global değişkenleri ve konfigürasyonları import et
-import './src/config/globals';
-import { connectToMongoDB } from './src/database/mongodb';
-import middlewares from './src/middlewares/index';
-// import errorHandler from './src/middlewares/errorHandler';
+import './config/globals';
+import { connectToMongoDB } from './database/mongodb';
+import middlewares from './middlewares/index';
+import ErrorHandler from './middlewares/ErrorHandler';
+import routes from './routes';
 
 // Express uygulamasını oluştur
 const app = express();
@@ -50,34 +56,30 @@ if (process.env.ORIGIN && process.env.ORIGIN.length >= 4) {
   app.use(cors());
 }
 
-// JSON ve Form verilerini işle
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.originalUrl === '/api/webhook') {
-    express.raw({ type: 'application/json' })(req, res, next);
-  } else {
-    express.json()(req, res, next);
-  }
-});
-
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware'leri uygula
 app.use(middlewares);
 
 // Route'ları uygula
-// app.use(routes);
+app.use(routes);
 
 // Cron işlerini başlat
 // import './tasks';
 
 // Hata yakalayıcı
-// app.use(errorHandler);
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  ErrorHandler(err, req, res, next);
+});
 
 // Sunucuyu başlat
 const PORT = process.env.PORT || 3000;
 const API_URL = process.env.API_URL || '';
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}${API_URL} | PID:${process.pid}`);
+  console.log(
+    '\x1b[32m%s\x1b[0m',
+    `Server running at http://localhost:${PORT}${API_URL} | PID:${process.pid}`,
+  );
 });
 
 // Cron endpoint'i
