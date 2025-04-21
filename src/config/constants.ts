@@ -14,6 +14,15 @@ const CONSTANTS = {
     USER: 'user',
     GUEST: 'guest',
   },
+  S3_PATHS: {
+    PROFILE: 'profiles',
+    DOCUMENTS: 'documents',
+  },
+  NOTIFICATON_PRIORITY: {
+    LOW: 'LOW',
+    MEDIUM: 'MEDIUM',
+    HIGH: 'HIGH',
+  },
   ERRORS: {
     PAGE_NOT_FOUND: [404, 'Page Not Found.'],
     // Auth & Profile:
@@ -50,14 +59,9 @@ const CONSTANTS = {
     // Upload:
     FILE_NOT_FOUND: [404, 'There is not any file for upload process.'],
     FILE_DISALLOW: [400, 'This file (or filetype) not allowed for upload.'],
-    // Payment:
-    PAYMENT_PASSIVE_SERVICE: [400, 'This payment method is not active. Try again later.'],
     MISSING_FIELDS: [400, 'Some fields are missing.'],
     PAYMENT_FAILED: [400, 'This payment method failed. Try again later.'],
     PAYMENT_INVALID_REQUEST: [400, 'This payment is invalid or maybe already paid or cancelled.'],
-    // Meeting:
-    MEETING_PASSIVE_SERVICE: [401, 'This meeting method is not active. Try again later.'],
-    MEETING_NOT_AVAILABLE: [401, 'This meeting is not available yet. Try again later.'],
     // INTERNALS:
     //Mongo/Mongoose:
     11000: [400, 'This record already exists.'],

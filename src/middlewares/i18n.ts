@@ -1,7 +1,6 @@
 import i18next from 'i18next';
 import i18nextHttpMiddleware from 'i18next-http-middleware';
 
-// Tip tanımlaması
 declare global {
   namespace Express {
     interface Request {

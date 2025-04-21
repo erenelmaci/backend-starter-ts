@@ -1,4 +1,4 @@
-import BaseModel, { IBaseDocument } from '../../database/BaseModel';
+import { IBaseDocument, Model } from '../../database/Model';
 import CONSTANTS from '../../config/constants';
 
 export interface IUser extends IBaseDocument {
@@ -16,11 +16,11 @@ export interface IUser extends IBaseDocument {
   password: string;
 }
 
-class User extends BaseModel<IUser> {
-  protected name = 'User';
-  protected table = 'user';
-  protected searchs = ['email', 'firstName', 'lastName', 'phone'];
-  protected fields = {
+const User = new (class extends Model {
+  name = 'User';
+  table = 'user';
+  searchs = ['email', 'firstName', 'lastName', 'phone'];
+  fields = {
     email: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     password: { type: String, required: true, select: false },
@@ -42,12 +42,8 @@ class User extends BaseModel<IUser> {
       default: CONSTANTS.SYSTEM_LANGUAGES.EN,
     },
   };
-  constructor() {
-    super(); // BaseModel constructor'ını çağırıyoruz
-    this.initModel(); // initModel'ı burada çağırıyoruz
-  }
-}
+})();
 
-const user = new User();
+User.run();
 
-export default user;
+export default User;

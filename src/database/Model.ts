@@ -2,18 +2,15 @@
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
-import mongoose, { Schema, Model, Document } from 'mongoose';
+import mongoose, { Schema, model, models } from 'mongoose';
 
-/* -------------------------------------------------- */
-
-// Index tanımı için interface
 interface ModelIndex {
   fields: Record<string, any>;
   options?: Record<string, any>;
 }
 
 // Base document interface
-export interface IBaseDocument extends Document {
+export interface IBaseDocument extends mongoose.Document {
   notes?: string;
   sortNumber?: number;
   isActive: boolean;
@@ -28,29 +25,28 @@ export interface IBaseDocument extends Document {
   isExists: boolean;
 }
 
-abstract class BaseModel<T extends IBaseDocument> {
+export class Model {
   // ------------------------------
   // MODEL:
   // ------------------------------
   protected ObjectId: typeof Schema.Types.ObjectId;
-  public Model!: Model<T>;
-  protected abstract name: string;
-  protected abstract table: string;
-  protected abstract fields: Record<string, any>;
+  public Model!: mongoose.Model<IBaseDocument>;
+  protected name: string = '';
+  protected table: string = '';
+  protected searchs: string[] = [];
+  protected fields: Record<string, any> = {};
   protected indexes?: ModelIndex[];
-  protected searchs?: string[];
 
   constructor() {
     this.ObjectId = Schema.Types.ObjectId;
-    // this.initModel();
   }
 
-  public initModel(): void {
-    const schema = this.ModelSchema();
-    this.Model = (mongoose.models[this.name] as Model<T>) || mongoose.model<T>(this.name, schema);
+  public run() {
+    this.Model = models[this.name] || model(this.name, this.ModelSchema());
+    return this;
   }
 
-  protected ModelSchema(): Schema {
+  protected ModelSchema() {
     const schema = new Schema(
       {
         ...this.fields,
@@ -80,7 +76,3 @@ abstract class BaseModel<T extends IBaseDocument> {
     return schema;
   }
 }
-
-/* -------------------------------------------------- */
-
-export default BaseModel;

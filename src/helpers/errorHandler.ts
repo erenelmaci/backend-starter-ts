@@ -1,7 +1,6 @@
 /* *******************************************************
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
-'use strict';
 /* -------------------------------------------------- */
 
 import { Request, Response, NextFunction } from 'express';
@@ -53,18 +52,14 @@ export const errorHandler = (
   res: Response,
   next: NextFunction,
 ): Response => {
-  // Error code'u al
   const errorCode = err.errorCode as keyof typeof CONSTANTS.ERRORS;
 
-  // Default error değerleri
   const defaultStatus = 500;
   const defaultMessage = err.message || 'Internal Server Error';
   const defaultCause = err.cause;
 
-  // CONSTANTS.ERRORS'dan hata bilgilerini al ve tip kontrolü yap
   const errorInfo = CONSTANTS.ERRORS[errorCode];
 
-  // Hata verisi oluştur
   const errorData: ErrorResponse = {
     error: true,
     method: req.method,
@@ -74,12 +69,10 @@ export const errorHandler = (
     cause: errorInfo && errorInfo[2] ? String(errorInfo[2]) : defaultCause,
   };
 
-  // Eksik alanları ekle
   if (err.missingFields) {
     errorData.details = err.missingFields;
   }
 
-  // Development ortamında ek bilgiler ekle
   if (process.env.NODE_ENV !== 'production') {
     Object.assign(errorData, {
       internal: err.message,
@@ -88,7 +81,6 @@ export const errorHandler = (
     });
   }
 
-  // Yanıt döndür
   return res.status(errorData.status).json(errorData);
 };
 

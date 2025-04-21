@@ -45,12 +45,10 @@ class S3Helper {
         throw createError(400, 'Geçersiz dosya tipi');
       }
 
-      // Dosya boyutunu kontrol et
       if (fileBuffer.length > s3Config.maxFileSize) {
         throw createError(400, 'File size exceeds limit');
       }
 
-      // Benzersiz dosya adı oluştur
       const key = `${folder}/${uuidv4()}${fileExtension}`;
 
       const command = new PutObjectCommand({
@@ -60,7 +58,6 @@ class S3Helper {
         ContentType: this._getContentType(fileExtension),
       });
 
-      // Upload işlemini bekle ve sonucu kontrol et
       await this.s3Client.send(command);
 
       return {
@@ -73,8 +70,8 @@ class S3Helper {
   }
 
   /**
-   * Dosya silme işlemi
-   * @param {string} key - Dosya anahtarı
+   * file delete func
+   * @param {string} key - file key
    * @returns {Promise<void>}
    */
   async deleteFile(key: string): Promise<void> {
@@ -95,10 +92,10 @@ class S3Helper {
   }
 
   /**
-   * Geçici URL oluşturma
-   * @param {string} key - Dosya anahtarı
-   * @param {number} expires - Geçerlilik süresi (saniye)
-   * @returns {Promise<string>} - Geçici URL
+   * persigned url
+   * @param {string} key - file key
+   * @param {number} expires - expires time
+   * @returns {Promise<string>} - presign url
    */
   async generatePresignedUrl(
     key: string,
@@ -120,9 +117,9 @@ class S3Helper {
   }
 
   /**
-   * Dosya sorgulama
-   * @param {string} key - Dosya anahtarı
-   * @returns {Promise<Object>} - Dosya metadata
+   * file query
+   * @param {string} key - file key
+   * @returns {Promise<Object>} - file metadata
    */
   async getFileMetadata(key: string): Promise<Object> {
     try {
@@ -138,13 +135,13 @@ class S3Helper {
   }
 
   /**
-   * Dosya güncelleme
-   * @param {string} oldKey - Eski dosya anahtarı
-   * @param {Buffer} fileBuffer - Yeni dosya buffer'ı
-   * @param {string} fileName - Yeni dosya adı
-   * @param {string} folder - Klasör adı
-   * @param {string} userId - Kullanıcı ID
-   * @returns {Promise<Object>} - Güncellenen dosya bilgileri
+   * file update
+   * @param {string} oldKey - old file key
+   * @param {Buffer} fileBuffer - new file buffer
+   * @param {string} fileName - new file name
+   * @param {string} folder - folder name
+   * @param {string} userId - user ID
+   * @returns {Promise<Object>} - updated file info
    */
   async updateFile(
     oldKey: string,
@@ -154,10 +151,8 @@ class S3Helper {
     userId: string,
   ): Promise<Object> {
     try {
-      // Eski dosyayı sil
       await this.deleteFile(oldKey);
 
-      // Yeni dosyayı yükle
       return await this.uploadFile(fileBuffer, fileName, folder, userId);
     } catch (error: any) {
       throw createError(error.statusCode || 500, error.message);
@@ -165,7 +160,7 @@ class S3Helper {
   }
 
   /**
-   * Dosya tipi kontrolü
+   *
    * @private
    */
   private _validateFileType(extension: string, folder: string): boolean {

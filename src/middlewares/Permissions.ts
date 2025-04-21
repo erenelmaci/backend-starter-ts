@@ -1,18 +1,15 @@
 /* *******************************************************
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
-'use strict';
 /* -------------------------------------------------- */
 
 import { NextFunction, Request, Response } from 'express';
-import CONSTANTS from '../config/constants';
 import { SendError } from '../helpers/errorHandler';
 
 export default class Permissions {
   public static isUserLogin() {
     return (req: Request, res: Response, next: NextFunction) => {
       if (!req.user) {
-        // AUTH_BLANK_DATA'nın ilk elemanını (error code) al
         throw new SendError('AUTH_BLANK_DATA');
       }
       next();
@@ -25,7 +22,6 @@ export default class Permissions {
         throw new SendError('AUTH_NO_PERMISSION');
       }
 
-      // Kullanıcının yetkilerini kontrol et
       const hasPermission = permissions.every(permission =>
         (req.user as any)?.permissions?.includes(permission),
       );

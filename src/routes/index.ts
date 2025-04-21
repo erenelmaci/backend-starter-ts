@@ -3,7 +3,6 @@ import routes from './router';
 
 const router = Router();
 
-// process.env'den API_URL'i al
 const API_URL = process.env.API_URL || '/api';
 
 router.all(API_URL, function (req, res, next) {

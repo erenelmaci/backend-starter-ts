@@ -21,7 +21,6 @@ interface ErrorData {
   body?: any;
 }
 
-// CONSTANTS.ERRORS için tip tanımı
 type ErrorCode = keyof typeof CONSTANTS.ERRORS;
 
 const ErrorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {

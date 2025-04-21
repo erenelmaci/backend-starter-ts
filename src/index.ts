@@ -6,7 +6,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-// Environment değişkenlerini yükle
 dotenv.config({
   path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
 });
@@ -18,24 +17,21 @@ console.log(
   process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development',
 );
 
-// Global değişkenleri ve konfigürasyonları import et
 import './config/globals';
 import { connectToMongoDB } from './database/mongodb';
 import middlewares from './middlewares/index';
 import ErrorHandler from './middlewares/errorHandler';
 import routes from './routes';
+import { setupSwagger } from './config/swagger';
 
-// Express uygulamasını oluştur
 const app = express();
 
-// Temel konfigürasyonlar
 app.set('env', process.env.ENV);
 app.disable('x-powered-by');
 
-// MongoDB'ye bağlan
 connectToMongoDB();
 
-// CORS ayarları
+// CORS settings
 if (process.env.ORIGIN && process.env.ORIGIN.length >= 4) {
   const origins = process.env.ORIGIN.replace(/\s*/g, '')
     .split(',')
@@ -58,21 +54,23 @@ if (process.env.ORIGIN && process.env.ORIGIN.length >= 4) {
 
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware'leri uygula
+// Middlewares
 app.use(middlewares);
 
-// Route'ları uygula
+// Routes
 app.use(routes);
 
-// Cron işlerini başlat
+// Crons
 // import './tasks';
 
-// Hata yakalayıcı
+// Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   ErrorHandler(err, req, res, next);
 });
 
-// Sunucuyu başlat
+setupSwagger(app);
+
+// Server Start
 const PORT = process.env.PORT || 3000;
 const API_URL = process.env.API_URL || '';
 app.listen(PORT, () => {
@@ -82,8 +80,8 @@ app.listen(PORT, () => {
   );
 });
 
-// Cron endpoint'i
+// Cron endpoint
 // app.get('/cron-job', cronJob);
 
-// Test verilerini sıfırlama endpoint'i
+// db reset
 // app.get('/reset-to-test-data-34caRwZcR32kicFYEkIhhM4g9LDSwjQk', resetToTestData);

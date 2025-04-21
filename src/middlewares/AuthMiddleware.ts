@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthService } from '../services/AuthService';
 import { ExpressRequestInterface } from '../interface/ExpressRequestInterface';
 import User, { IUser } from '../apps/user/model';
 import { RedisUserModel } from '../cache/model/RedisUserModel';
-
-const authService = new AuthService();
+import { db } from '../database/Controller';
+import { validateToken } from '../services/AuthService';
 
 declare global {
   namespace Express {
@@ -26,12 +25,12 @@ export const AuthMiddleware = async (
       return res.status(401).json({ message: 'Token bulunamadı' });
     }
 
-    const decoded = await authService.validateToken(token);
+    const decoded = await validateToken(token);
     if (!decoded) {
       return res.status(401).json({ message: 'Geçersiz token' });
     }
 
-    const user = await db.read<IUser>(User.Model, { _id: decoded._id });
+    const user = await db.read(User.Model, { _id: decoded._id });
     if (!user) {
       return res.status(401).json({ message: 'Kullanıcı bulunamadı' });
     }
