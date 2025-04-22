@@ -37,11 +37,14 @@ cd backend-starter-ts
 2. **Environment Setup**
 
 ```bash
+# Copy example environment file
+cp .env.example
+
 # For development
-cp .env.development .env
+cp .env.development
 
 # For production
-cp .env.production .env
+cp .env.production
 ```
 
 3. **Install dependencies**
@@ -54,7 +57,7 @@ npm install
 
 ```bash
 # Development mode
-npm run dev
+npm run start:dev
 
 # Production mode
 npm start
@@ -71,3 +74,25 @@ docker-compose logs -f
 ```
 
 ## Project Structure
+
+```
+
+## Documentation
+For detailed technical documentation, please refer to:
+- [Backend Development Guide](developer-guide/backend.md)
+- [DevOps Guide](developer-guide/devops.md)
+- [Frontend Integration Guide](developer-guide/frontend.md)
+
+## Environment Configuration
+The application automatically loads the appropriate environment file based on `NODE_ENV`:
+- Development: `.env.development`
+- Production: `.env.production`
+
+## Support
+For technical support or questions, please contact:
+- Email: info@bursayazilimevi.com
+- Website: https://bursayazilimevi.com
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+```
