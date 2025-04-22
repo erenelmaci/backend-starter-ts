@@ -20,7 +20,7 @@ console.log(
 import './config/globals';
 import { connectToMongoDB } from './database/mongodb';
 import middlewares from './middlewares/index';
-import ErrorHandler from './middlewares/errorHandler';
+import ErrorHandler from './middlewares/ErrorHandler';
 import routes from './routes';
 import { setupSwagger } from './config/swagger';
 

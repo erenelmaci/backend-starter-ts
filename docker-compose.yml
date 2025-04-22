@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.production
+    volumes:
+      - .:/user/src/app:rw
+    command: ['npm', 'start']
+    depends_on:
+      - rabbitmq
+      - redis
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      retries: 3
+      start_period: 5s
+      timeout: 2s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '15672:15672' # RabbitMQ Management UI
+      - '5672:5672' # RabbitMQ Port
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 10s
+      retries: 3
+      start_period: 5s
+      timeout: 2s

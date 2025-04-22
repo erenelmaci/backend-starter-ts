@@ -63,7 +63,7 @@ npm run start:dev
 npm start
 ```
 
-### Docker Setup
+### Docker starter
 
 ```bash
 # Build and start all services
@@ -71,6 +71,16 @@ docker-compose up -d
 
 # View logs
 docker-compose logs -f
+```
+
+### Kubernetes starter
+
+```bash
+# Build image
+docker build -t backend-starter:latest .
+
+# View logs
+kubectl apply -f k8s/
 ```
 
 ## Project Structure
