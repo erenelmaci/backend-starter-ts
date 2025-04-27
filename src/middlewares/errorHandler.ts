@@ -1,5 +1,5 @@
 import CONSTANTS from '../config/constants';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 interface CustomError extends Error {
   errorCode?: string;
@@ -23,7 +23,7 @@ interface ErrorData {
 
 type ErrorCode = keyof typeof CONSTANTS.ERRORS;
 
-const ErrorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
+const ErrorHandler = (err: CustomError, req: Request, res: Response) => {
   let errorData: ErrorData = {
     error: true,
     method: req.method,

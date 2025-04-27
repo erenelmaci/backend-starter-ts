@@ -2,7 +2,7 @@
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
@@ -20,7 +20,7 @@ console.log(
 import './config/globals';
 import { connectToMongoDB } from './database/mongodb';
 import middlewares from './middlewares/index';
-import ErrorHandler from './middlewares/ErrorHandler';
+import ErrorHandler from './middlewares/errorHandler';
 import routes from './routes';
 import { setupSwagger } from './config/swagger';
 
@@ -64,8 +64,8 @@ app.use(routes);
 // import './tasks';
 
 // Error handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  ErrorHandler(err, req, res, next);
+app.use((err: Error, req: Request, res: Response) => {
+  ErrorHandler(err, req, res);
 });
 
 setupSwagger(app);

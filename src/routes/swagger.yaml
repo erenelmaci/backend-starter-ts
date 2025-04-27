@@ -1,0 +1,81 @@
+openapi: 3.0.0
+info:
+  title: API Başlığı
+  version: 1.0.0
+  description: API açıklaması
+paths: {}
+servers:
+  - url: /api
+    description: API Sunucusu
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token ile kimlik doğrulama
+  parameters:
+    page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+      description: Sayfa numarası
+    limit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        default: 10
+      description: Sayfa başına kayıt sayısı
+  responses:
+    UnauthorizedError:
+      description: Yetkisiz erişim
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Yetkisiz erişim
+    ForbiddenError:
+      description: İzin reddedildi
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: İzin reddedildi
+    NotFoundError:
+      description: Kayıt bulunamadı
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Kayıt bulunamadı
+    BadRequestError:
+      description: Geçersiz istek
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Geçersiz istek
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                    message:
+                      type: string

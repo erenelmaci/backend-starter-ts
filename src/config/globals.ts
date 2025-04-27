@@ -4,9 +4,6 @@
 
 import { Response } from 'express';
 import systemSettings from './systemSettings';
-import { Model } from 'mongoose';
-import { IBaseDocument } from '../database/Model';
-import mongoose from 'mongoose';
 import CONSTANTS from './constants';
 
 declare global {

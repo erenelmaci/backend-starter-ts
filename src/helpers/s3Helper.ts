@@ -28,14 +28,14 @@ class S3Helper {
    * @param {Buffer} fileBuffer - Dosya buffer'ı
    * @param {string} fileName - Dosya adı
    * @param {string} folder - Klasör adı (profiles/documents)
-   * @param {string} userId - Kullanıcı ID
+  //  * @param {string} userId - Kullanıcı ID
    * @returns {Promise<Object>} - Yüklenen dosya bilgileri
    */
   async uploadFile(
     fileBuffer: Buffer,
     fileName: string,
     folder: string,
-    userId: string,
+    // userId: string,
   ): Promise<Object> {
     try {
       const fileExtension = path.extname(fileName).toLowerCase();
@@ -148,12 +148,11 @@ class S3Helper {
     fileBuffer: Buffer,
     fileName: string,
     folder: string,
-    userId: string,
   ): Promise<Object> {
     try {
       await this.deleteFile(oldKey);
 
-      return await this.uploadFile(fileBuffer, fileName, folder, userId);
+      return await this.uploadFile(fileBuffer, fileName, folder);
     } catch (error: any) {
       throw createError(error.statusCode || 500, error.message);
     }

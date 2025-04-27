@@ -1,45 +1,212 @@
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import { IBaseDocument } from './Model';
+import { Request } from 'express';
 
 export interface ListResponse<T> {
-  items: T[];
-  pagination: {
-    total: number;
-    page: number;
+  error: boolean;
+  method: string;
+  info: {
+    filter: any;
+    select: string | undefined;
+    sort: {
+      [key: string]: SortOrder;
+    };
+    skip: number;
     limit: number;
-    pages: number;
+    page: number;
+    pages:
+      | {
+          previous: number | boolean;
+          current: number;
+          next: number | boolean;
+          total: number;
+        }
+      | boolean;
+    totalRecords: number;
+    url: string;
   };
+  data: T[];
 }
 
 export const db = {
   list: async <T extends IBaseDocument>(
     model: Model<T>,
-    query: any = {},
-    options: any = {},
+    req: Request,
   ): Promise<ListResponse<T>> => {
-    const { page = 1, limit = 10, search } = query;
-    const skip = (Number(page) - 1) * Number(limit);
+    // ------------------------------
+    //! PARSE QUERY PARAMETERS
+    // ------------------------------
+    const queryParams = req.query;
+    const pageRaw = queryParams.page;
+    const limitRaw = queryParams.limit;
+    const page = Math.max(1, Number(pageRaw) || 1);
+    const limit = Math.max(1, Number(limitRaw) || 20);
 
-    let filter: any = { isExists: true, isActive: true, deletedAt: null };
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-      ];
+    console.log('Query Params:', { page, limit, queryParams });
+
+    // ------------------------------
+    //! FILTER: Supports operators like gt, gte, lt, lte, ne, eq, regex, in, nin
+    //? Example: filter[age]=gt:18 or filter[name]=regex:john
+    // ------------------------------
+    const filter: any = {};
+    Object.keys(queryParams).forEach(key => {
+      if (key.startsWith('filter[')) {
+        const field = key.replace('filter[', '').replace(']', '');
+        const value = queryParams[key];
+
+        if (typeof value === 'string' && value.includes(':')) {
+          const [operator, rawVal] = value.split(':');
+          switch (operator) {
+            case 'gt':
+              filter[field] = { $gt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
+              break;
+            case 'gte':
+              filter[field] = { $gte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
+              break;
+            case 'lt':
+              filter[field] = { $lt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
+              break;
+            case 'lte':
+              filter[field] = { $lte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
+              break;
+            case 'ne':
+              filter[field] = { $ne: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
+              break;
+            case 'eq':
+              filter[field] = isNaN(Number(rawVal)) ? rawVal : Number(rawVal);
+              break;
+            case 'regex':
+              filter[field] = { $regex: rawVal, $options: 'i' };
+              break;
+            case 'in':
+              filter[field] = { $in: rawVal.split(',') };
+              break;
+            case 'nin':
+              filter[field] = { $nin: rawVal.split(',') };
+              break;
+            default:
+              filter[field] = isNaN(Number(value)) ? value : Number(value);
+          }
+        } else {
+          //? Simple value (no operator)
+          filter[field] = isNaN(Number(value)) ? value : Number(value);
+        }
+      }
+    });
+
+    // ------------------------------
+    //! FILTER DEFAULTS: Only active and existing records if no filter is provided
+    // ------------------------------
+    const queryFilter =
+      Object.keys(filter).length > 0 ? filter : { isExists: true, isActive: true, deletedAt: null };
+
+    // ------------------------------
+    //! SORT: Supports sort[field]=asc|desc
+    //? Example: sort[createdAt]=desc
+    // ------------------------------
+    const sort: any = {};
+    Object.keys(queryParams).forEach(key => {
+      if (key.startsWith('sort[')) {
+        const field = key.replace('sort[', '').replace(']', '');
+        const value = queryParams[key];
+        sort[field] = value === 'desc' ? -1 : 1;
+      }
+    });
+    const sortOptions = Object.keys(sort).length > 0 ? sort : { createdAt: -1 };
+
+    // ------------------------------
+    //! SELECT: Fields to return
+    //? Example: select=_id,name,email
+    // ------------------------------
+    const selectFields = queryParams.select ? String(queryParams.select) : undefined;
+
+    // ------------------------------
+    //! DATABASE QUERY: Count first to determine pagination
+    // ------------------------------
+    const total = await model.countDocuments(queryFilter);
+
+    // ------------------------------
+    //! PAGINATION: Calculate based on total records
+    // ------------------------------
+    const limitNumber = Math.max(1, limit);
+    const totalPages = limitNumber > 0 ? Math.ceil(total / limitNumber) : 1;
+    const currentPage = Math.min(page, totalPages > 0 ? totalPages : 1);
+    const skip = total > 0 ? (currentPage - 1) * limitNumber : 0;
+
+    console.log('Pagination:', { currentPage, totalPages, skip, limitNumber });
+
+    // ------------------------------
+    //! DATABASE QUERY: Find with pagination
+    // ------------------------------
+    const items = await model
+      .find(queryFilter, selectFields)
+      .populate((model as any).listJoins || [])
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNumber);
+
+    // ------------------------------
+    //! PAGINATION DETAILS
+    // ------------------------------
+    let pages: ListResponse<T>['info']['pages'];
+    if (limitNumber > 0 && total > limitNumber) {
+      pages = {
+        previous: currentPage > 1 ? currentPage - 1 : false,
+        current: currentPage,
+        next: currentPage < totalPages ? currentPage + 1 : false,
+        total: totalPages,
+      };
+    } else {
+      pages = false;
     }
 
-    const items = await model.find(filter).skip(skip).limit(Number(limit)).sort({ createdAt: -1 });
+    console.log(currentPage);
 
-    const total = await model.countDocuments(filter);
+    // ------------------------------
+    //! URL GENERATION: Rebuild query string for info
+    // ------------------------------
+    const urlParams = new URLSearchParams();
+    urlParams.append('page', String(pageRaw || 1));
+    if (limitRaw && Number(limitRaw) !== 20) urlParams.append('limit', String(limitRaw));
 
+    //? Add filter parameters
+    Object.keys(filter).forEach(key => {
+      if (filter[key] !== undefined) {
+        urlParams.append(`filter[${key}]`, String(filter[key]));
+      }
+    });
+
+    //? Add sort parameters
+    Object.keys(sort).forEach(key => {
+      if (sort[key] !== undefined) {
+        urlParams.append(`sort[${key}]`, sort[key] === -1 ? 'desc' : 'asc');
+      }
+    });
+
+    //? Add select if exists
+    if (queryParams.select) urlParams.append('select', String(queryParams.select));
+
+    const queryString = urlParams.toString();
+    const url = req.originalUrl.split('?')[0];
+
+    // ------------------------------
+    //! RESPONSE
+    // ------------------------------
     return {
-      items,
-      pagination: {
-        total,
-        page: Number(page),
-        limit: Number(limit),
-        pages: Math.ceil(total / Number(limit)),
+      error: false,
+      method: req.method || 'GET',
+      info: {
+        filter: queryFilter,
+        select: selectFields,
+        sort: sortOptions,
+        skip,
+        limit: limitNumber,
+        page: currentPage,
+        pages,
+        totalRecords: total,
+        url: queryString ? `${url}?${queryString}` : url,
       },
+      data: items,
     };
   },
 
@@ -54,7 +221,7 @@ export const db = {
   },
 
   read: async <T extends IBaseDocument>(model: Model<T>, filter: any): Promise<T | null> => {
-    return model.findOne({ ...filter, isExists: true });
+    return model.findOne({ ...filter }).populate((model as any).listJoins);
   },
 
   update: async <T extends IBaseDocument>(

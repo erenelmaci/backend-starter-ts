@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { ExpressRequestInterface } from '../interface/ExpressRequestInterface';
 import User, { IUser } from '../apps/user/model';
 import { RedisUserModel } from '../cache/model/RedisUserModel';
@@ -30,7 +30,7 @@ export const AuthMiddleware = async (
       return res.status(401).json({ message: 'Geçersiz token' });
     }
 
-    const user = await db.read(User.Model, { _id: decoded._id });
+    const user = await db.read(User.Model, { _id: decoded });
     if (!user) {
       return res.status(401).json({ message: 'Kullanıcı bulunamadı' });
     }

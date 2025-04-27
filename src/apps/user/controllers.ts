@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import User from './model';
 import { isUserHasPermission, isUserLogin } from '../../middlewares/Permissions';
-import { Types } from 'mongoose';
 import { db } from '../../database/Controller';
 
 export const user = {
-  listMiddlewares: [isUserLogin(), isUserHasPermission(['user', 'list'])],
+  listMiddlewares: [],
 
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await db.list(User.Model, req.query);
+      const result = await db.list(User.Model, req);
       view(res, 200, result);
     } catch (error) {
       next(error);

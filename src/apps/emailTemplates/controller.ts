@@ -8,7 +8,7 @@ export const emailTemplate = {
 
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await db.list(EmailTemplate.Model, req.query);
+      const result = await db.list(EmailTemplate.Model, req);
       view(res, 200, result);
     } catch (error) {
       next(error);

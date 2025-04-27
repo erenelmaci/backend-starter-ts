@@ -52,7 +52,7 @@ export const validateToken = async (token: string) => {
     const user = await db.read(User.Model, { _id: decoded.userId });
     return user;
   } catch (error) {
-    return null;
+    return error;
   }
 };
 

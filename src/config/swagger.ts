@@ -1,19 +1,19 @@
 import { Request, Response, Express } from 'express';
-import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
+import yaml from 'js-yaml';
 
 const packageJson = require(DIR + '/package.json');
 
-function getAllFiles(dirPath: string, arrayOfFiles: string[] = []) {
+function getAllYamlFiles(dirPath: string, arrayOfFiles: string[] = []) {
   const files = fs.readdirSync(dirPath);
 
   files.forEach(file => {
     const fullPath = path.join(dirPath, file);
     if (fs.statSync(fullPath).isDirectory()) {
-      getAllFiles(fullPath, arrayOfFiles);
-    } else if (fullPath.endsWith('.ts')) {
+      getAllYamlFiles(fullPath, arrayOfFiles);
+    } else if (fullPath.endsWith('.yaml')) {
       arrayOfFiles.push(fullPath);
     }
   });
@@ -21,10 +21,8 @@ function getAllFiles(dirPath: string, arrayOfFiles: string[] = []) {
   return arrayOfFiles;
 }
 
-const files = getAllFiles(DIR + '/src/apps');
-
-const options = {
-  definition: {
+function loadYamlFiles(files: string[]) {
+  const swaggerSpec = {
     openapi: '3.0.0',
     info: {
       title: packageJson.name,
@@ -53,17 +51,64 @@ const options = {
           bearerFormat: 'JWT',
         },
       },
+      schemas: {},
     },
     security: [
       {
         bearerAuth: [],
       },
     ],
-  },
-  apis: files,
-};
+    paths: {},
+  };
 
-const swaggerSpec = swaggerJSDoc(options);
+  try {
+    // Global YAML dosyasını oku
+    const globalYamlPath = path.join(DIR, 'src/routes/swagger.yaml');
+    if (fs.existsSync(globalYamlPath)) {
+      const globalYamlContent = fs.readFileSync(globalYamlPath, 'utf8');
+      const globalYamlData = yaml.load(globalYamlContent) as any;
+
+      if (globalYamlData) {
+        // Global verileri birleştir
+        if (globalYamlData.components) {
+          Object.assign(swaggerSpec.components, globalYamlData.components);
+        }
+        if (globalYamlData.security) {
+          swaggerSpec.security = globalYamlData.security;
+        }
+      }
+    }
+
+    // Modül bazlı YAML dosyalarını oku ve birleştir
+    files.forEach(file => {
+      try {
+        const yamlContent = fs.readFileSync(file, 'utf8');
+        const yamlData = yaml.load(yamlContent) as any;
+
+        if (yamlData) {
+          // Merge paths
+          if (yamlData.paths) {
+            Object.assign(swaggerSpec.paths, yamlData.paths);
+          }
+
+          // Merge schemas
+          if (yamlData.components && yamlData.components.schemas) {
+            Object.assign(swaggerSpec.components.schemas, yamlData.components.schemas);
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading YAML file ${file}:`, error);
+      }
+    });
+  } catch (error) {
+    console.error('Error loading global YAML file:', error);
+  }
+
+  return swaggerSpec;
+}
+
+const yamlFiles = getAllYamlFiles(DIR + '/src/apps');
+const swaggerSpec = loadYamlFiles(yamlFiles);
 
 export const setupSwagger = (app: Express) => {
   app.use(

@@ -3,8 +3,7 @@
  ******************************************************* */
 /* -------------------------------------------------- */
 
-import { Request, Response, NextFunction } from 'express';
-import { existsSync, rmSync } from 'node:fs';
+import { Request, Response } from 'express';
 import CONSTANTS from '../config/constants';
 
 // Custom error interface
@@ -46,12 +45,7 @@ export class SendError extends Error {
 }
 
 // ErrorHandler middleware
-export const errorHandler = (
-  err: CustomError,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Response => {
+export const errorHandler = (err: CustomError, req: Request, res: Response): Response => {
   const errorCode = err.errorCode as keyof typeof CONSTANTS.ERRORS;
 
   const defaultStatus = 500;
