@@ -1,25 +1,25 @@
-import { IBaseDocument, Model } from '../../database/Model';
-import CONSTANTS from '../../config/constants';
+import { IBaseDocument, Model } from '../../database/Model'
+import CONSTANTS from '../../config/constants'
 
 export interface IUser extends IBaseDocument {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  role: string;
-  isEmailVerified: boolean;
-  profileImage: string;
-  address: string;
-  city: string;
-  country: string;
-  systemLanguage: string;
-  password: string;
+  email: string
+  firstName: string
+  lastName: string
+  phone: string
+  role: string
+  isEmailVerified: boolean
+  profileImage: string
+  address: string
+  city: string
+  country: string
+  systemLanguage: string
+  password: string
 }
 
 const User = new (class extends Model {
-  name = 'User';
-  table = 'user';
-  searchs = ['email', 'firstName', 'lastName', 'phone'];
+  name = 'User'
+  table = 'user'
+  searchs = ['email', 'firstName', 'lastName', 'phone']
   fields = {
     email: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
@@ -41,9 +41,9 @@ const User = new (class extends Model {
       enum: Object.values(CONSTANTS.SYSTEM_LANGUAGES),
       default: CONSTANTS.SYSTEM_LANGUAGES.EN,
     },
-  };
-})();
+  }
+})()
 
-User.run();
+User.run()
 
-export default User;
+export default User

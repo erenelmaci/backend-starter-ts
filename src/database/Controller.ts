@@ -1,31 +1,31 @@
-import { Model, SortOrder } from 'mongoose';
-import { IBaseDocument } from './Model';
-import { Request } from 'express';
+import { Model, SortOrder } from 'mongoose'
+import { IBaseDocument } from './Model'
+import { Request } from 'express'
 
 export interface ListResponse<T> {
-  error: boolean;
-  method: string;
+  error: boolean
+  method: string
   info: {
-    filter: any;
-    select: string | undefined;
+    filter: any
+    select: string | undefined
     sort: {
-      [key: string]: SortOrder;
-    };
-    skip: number;
-    limit: number;
-    page: number;
+      [key: string]: SortOrder
+    }
+    skip: number
+    limit: number
+    page: number
     pages:
       | {
-          previous: number | boolean;
-          current: number;
-          next: number | boolean;
-          total: number;
+          previous: number | boolean
+          current: number
+          next: number | boolean
+          total: number
         }
-      | boolean;
-    totalRecords: number;
-    url: string;
-  };
-  data: T[];
+      | boolean
+    totalRecords: number
+    url: string
+  }
+  data: T[]
 }
 
 export const db = {
@@ -36,104 +36,100 @@ export const db = {
     // ------------------------------
     //! PARSE QUERY PARAMETERS
     // ------------------------------
-    const queryParams = req.query;
-    const pageRaw = queryParams.page;
-    const limitRaw = queryParams.limit;
-    const page = Math.max(1, Number(pageRaw) || 1);
-    const limit = Math.max(1, Number(limitRaw) || 20);
+    const queryParams = req.query
+    const pageRaw = queryParams.page
+    const limitRaw = queryParams.limit
+    const page = Math.max(1, Number(pageRaw) || 1)
+    const limit = Math.max(1, Number(limitRaw) || 20)
 
-    console.log('Query Params:', { page, limit, queryParams });
+    console.log('Query Params:', { page, limit, queryParams })
 
     // ------------------------------
     //! FILTER: Supports operators like gt, gte, lt, lte, ne, eq, regex, in, nin
-    //? Example: filter[age]=gt:18 or filter[name]=regex:john
     // ------------------------------
-    const filter: any = {};
+    const filter: any = {}
     Object.keys(queryParams).forEach(key => {
       if (key.startsWith('filter[')) {
-        const field = key.replace('filter[', '').replace(']', '');
-        const value = queryParams[key];
+        const field = key.replace('filter[', '').replace(']', '')
+        const value = queryParams[key]
 
         if (typeof value === 'string' && value.includes(':')) {
-          const [operator, rawVal] = value.split(':');
+          const [operator, rawVal] = value.split(':')
           switch (operator) {
             case 'gt':
-              filter[field] = { $gt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
-              break;
+              filter[field] = { $gt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) }
+              break
             case 'gte':
-              filter[field] = { $gte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
-              break;
+              filter[field] = { $gte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) }
+              break
             case 'lt':
-              filter[field] = { $lt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
-              break;
+              filter[field] = { $lt: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) }
+              break
             case 'lte':
-              filter[field] = { $lte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
-              break;
+              filter[field] = { $lte: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) }
+              break
             case 'ne':
-              filter[field] = { $ne: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) };
-              break;
+              filter[field] = { $ne: isNaN(Number(rawVal)) ? rawVal : Number(rawVal) }
+              break
             case 'eq':
-              filter[field] = isNaN(Number(rawVal)) ? rawVal : Number(rawVal);
-              break;
+              filter[field] = isNaN(Number(rawVal)) ? rawVal : Number(rawVal)
+              break
             case 'regex':
-              filter[field] = { $regex: rawVal, $options: 'i' };
-              break;
+              filter[field] = { $regex: rawVal, $options: 'i' }
+              break
             case 'in':
-              filter[field] = { $in: rawVal.split(',') };
-              break;
+              filter[field] = { $in: rawVal.split(',') }
+              break
             case 'nin':
-              filter[field] = { $nin: rawVal.split(',') };
-              break;
+              filter[field] = { $nin: rawVal.split(',') }
+              break
             default:
-              filter[field] = isNaN(Number(value)) ? value : Number(value);
+              filter[field] = isNaN(Number(value)) ? value : Number(value)
           }
         } else {
-          //? Simple value (no operator)
-          filter[field] = isNaN(Number(value)) ? value : Number(value);
+          filter[field] = isNaN(Number(value)) ? value : Number(value)
         }
       }
-    });
+    })
 
     // ------------------------------
     //! FILTER DEFAULTS: Only active and existing records if no filter is provided
     // ------------------------------
     const queryFilter =
-      Object.keys(filter).length > 0 ? filter : { isExists: true, isActive: true, deletedAt: null };
+      Object.keys(filter).length > 0 ? filter : { isExists: true, isActive: true, deletedAt: null }
 
     // ------------------------------
     //! SORT: Supports sort[field]=asc|desc
-    //? Example: sort[createdAt]=desc
     // ------------------------------
-    const sort: any = {};
+    const sort: any = {}
     Object.keys(queryParams).forEach(key => {
       if (key.startsWith('sort[')) {
-        const field = key.replace('sort[', '').replace(']', '');
-        const value = queryParams[key];
-        sort[field] = value === 'desc' ? -1 : 1;
+        const field = key.replace('sort[', '').replace(']', '')
+        const value = queryParams[key]
+        sort[field] = value === 'desc' ? -1 : 1
       }
-    });
-    const sortOptions = Object.keys(sort).length > 0 ? sort : { createdAt: -1 };
+    })
+    const sortOptions = Object.keys(sort).length > 0 ? sort : { createdAt: -1 }
 
     // ------------------------------
     //! SELECT: Fields to return
-    //? Example: select=_id,name,email
     // ------------------------------
-    const selectFields = queryParams.select ? String(queryParams.select) : undefined;
+    const selectFields = queryParams.select ? String(queryParams.select) : undefined
 
     // ------------------------------
     //! DATABASE QUERY: Count first to determine pagination
     // ------------------------------
-    const total = await model.countDocuments(queryFilter);
+    const total = await model.countDocuments(queryFilter)
 
     // ------------------------------
     //! PAGINATION: Calculate based on total records
     // ------------------------------
-    const limitNumber = Math.max(1, limit);
-    const totalPages = limitNumber > 0 ? Math.ceil(total / limitNumber) : 1;
-    const currentPage = Math.min(page, totalPages > 0 ? totalPages : 1);
-    const skip = total > 0 ? (currentPage - 1) * limitNumber : 0;
+    const limitNumber = Math.max(1, limit)
+    const totalPages = limitNumber > 0 ? Math.ceil(total / limitNumber) : 1
+    const currentPage = Math.min(page, totalPages > 0 ? totalPages : 1)
+    const skip = total > 0 ? (currentPage - 1) * limitNumber : 0
 
-    console.log('Pagination:', { currentPage, totalPages, skip, limitNumber });
+    console.log('Pagination:', { currentPage, totalPages, skip, limitNumber })
 
     // ------------------------------
     //! DATABASE QUERY: Find with pagination
@@ -143,51 +139,51 @@ export const db = {
       .populate((model as any).listJoins || [])
       .sort(sortOptions)
       .skip(skip)
-      .limit(limitNumber);
+      .limit(limitNumber)
 
     // ------------------------------
     //! PAGINATION DETAILS
     // ------------------------------
-    let pages: ListResponse<T>['info']['pages'];
+    let pages: ListResponse<T>['info']['pages']
     if (limitNumber > 0 && total > limitNumber) {
       pages = {
         previous: currentPage > 1 ? currentPage - 1 : false,
         current: currentPage,
         next: currentPage < totalPages ? currentPage + 1 : false,
         total: totalPages,
-      };
+      }
     } else {
-      pages = false;
+      pages = false
     }
 
-    console.log(currentPage);
+    console.log(currentPage)
 
     // ------------------------------
     //! URL GENERATION: Rebuild query string for info
     // ------------------------------
-    const urlParams = new URLSearchParams();
-    urlParams.append('page', String(pageRaw || 1));
-    if (limitRaw && Number(limitRaw) !== 20) urlParams.append('limit', String(limitRaw));
+    const urlParams = new URLSearchParams()
+    urlParams.append('page', String(pageRaw || 1))
+    if (limitRaw && Number(limitRaw) !== 20) urlParams.append('limit', String(limitRaw))
 
     //? Add filter parameters
     Object.keys(filter).forEach(key => {
       if (filter[key] !== undefined) {
-        urlParams.append(`filter[${key}]`, String(filter[key]));
+        urlParams.append(`filter[${key}]`, String(filter[key]))
       }
-    });
+    })
 
     //? Add sort parameters
     Object.keys(sort).forEach(key => {
       if (sort[key] !== undefined) {
-        urlParams.append(`sort[${key}]`, sort[key] === -1 ? 'desc' : 'asc');
+        urlParams.append(`sort[${key}]`, sort[key] === -1 ? 'desc' : 'asc')
       }
-    });
+    })
 
     //? Add select if exists
-    if (queryParams.select) urlParams.append('select', String(queryParams.select));
+    if (queryParams.select) urlParams.append('select', String(queryParams.select))
 
-    const queryString = urlParams.toString();
-    const url = req.originalUrl.split('?')[0];
+    const queryString = urlParams.toString()
+    const url = req.originalUrl.split('?')[0]
 
     // ------------------------------
     //! RESPONSE
@@ -207,21 +203,27 @@ export const db = {
         url: queryString ? `${url}?${queryString}` : url,
       },
       data: items,
-    };
+    }
   },
 
-  create: async <T extends IBaseDocument>(model: Model<T>, data: Partial<T>): Promise<T> => {
-    return model.create({
+  create: async <T extends IBaseDocument>(model: Model<T>, data: Partial<T>): Promise<any> => {
+    const createdData = await model.create({
       ...data,
       createdAt: new Date(),
       isExists: true,
       canUpdate: true,
       canDelete: true,
-    });
+    })
+    return {
+      error: false,
+      message: 'Created successfully',
+      data: createdData.toObject(),
+      timestamp: new Date().toISOString(),
+    }
   },
 
   read: async <T extends IBaseDocument>(model: Model<T>, filter: any): Promise<T | null> => {
-    return model.findOne({ ...filter }).populate((model as any).listJoins);
+    return model.findOne({ ...filter }).populate((model as any).listJoins)
   },
 
   update: async <T extends IBaseDocument>(
@@ -229,17 +231,23 @@ export const db = {
     id: string,
     data: Partial<T>,
   ): Promise<T | null> => {
-    return model.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true });
+    return model.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true })
   },
 
-  remove: async <T extends IBaseDocument>(model: Model<T>, id: string): Promise<T | null> => {
-    return model.findByIdAndUpdate(
+  remove: async <T extends IBaseDocument>(model: Model<T>, id: string): Promise<any> => {
+    const removedData = await model.findByIdAndUpdate(
       id,
       {
         isExists: false,
         deletedAt: new Date(),
       },
       { new: true },
-    );
+    )
+    return {
+      error: false,
+      message: 'Record removed successfully',
+      data: removedData ? removedData.toObject() : null,
+      timestamp: new Date().toISOString(),
+    }
   },
-};
+}

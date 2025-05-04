@@ -1,12 +1,12 @@
-import CONSTANTS from '../../config/constants';
+import CONSTANTS from '../../config/constants'
 
 export interface IRedisUserModel {
-  id: string;
-  role: typeof CONSTANTS.USER_ROLES;
-  email: string;
-  firstName: string;
-  lastName: string;
-  profileImage?: string;
+  id: string
+  role: typeof CONSTANTS.USER_ROLES
+  email: string
+  firstName: string
+  lastName: string
+  profileImage?: string
 }
 
 export class RedisUserModel {

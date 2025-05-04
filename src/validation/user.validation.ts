@@ -1,5 +1,5 @@
-import Joi from 'joi';
-import CONSTANTS from '../config/constants';
+import Joi from 'joi'
+import CONSTANTS from '../config/constants'
 
 export default class UserValidation {
   public static createUserSchema = Joi.object({
@@ -14,7 +14,7 @@ export default class UserValidation {
     city: Joi.string(),
     country: Joi.string(),
     systemLanguage: Joi.string().valid(...Object.values(CONSTANTS.SYSTEM_LANGUAGES)),
-  });
+  })
 
   public static updateUserSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -29,9 +29,9 @@ export default class UserValidation {
     city: Joi.string(),
     country: Joi.string(),
     systemLanguage: Joi.string().valid(...Object.values(CONSTANTS.SYSTEM_LANGUAGES)),
-  });
+  })
 
   public static idGetUserSchema = Joi.object({
     id: Joi.string().required(),
-  });
+  })
 }

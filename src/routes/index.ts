@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import routes from './router';
+import { Router } from 'express'
+import routes from './router'
 
-const router = Router();
+const router = Router()
 
-const API_URL = process.env.API_URL || '/api';
+const API_URL = process.env.API_URL || '/api'
 
 router.all(API_URL, function (req, res) {
   res.send(`
@@ -14,13 +14,13 @@ router.all(API_URL, function (req, res) {
             <li><a href="${API_URL}/documents/json">JSON <==== POSTMAN OPENAPI IMPORT </a></li>
         </ul>
     </p>
-  `);
-});
+  `)
+})
 
-router.use('/api', routes);
+router.use('/api', routes)
 
 router.all('/api', (req, res) => {
-  view(res, 404, { message: 'Not Found' });
-});
+  view(res, 404, { message: 'Not Found' })
+})
 
-export default router;
+export default router

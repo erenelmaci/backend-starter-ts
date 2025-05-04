@@ -1,9 +1,9 @@
-import { Model } from '../../database/Model';
+import { Model } from '../../database/Model'
 
 const EmailTemplate = new (class extends Model {
-  name = 'EmailTemaplate';
-  table = 'emailTemplate';
-  searchs = [];
+  name = 'EmailTemaplate'
+  table = 'emailTemplate'
+  searchs = []
   fields = {
     emailLanguage: { type: String, trim: true, default: 'en' },
     emailTemplate: { type: String, trim: true, default: '{{content}}' },
@@ -35,9 +35,9 @@ const EmailTemplate = new (class extends Model {
         content: null,
       },
     },
-  };
-})();
+  }
+})()
 
-EmailTemplate.run();
+EmailTemplate.run()
 
-export default EmailTemplate;
+export default EmailTemplate

@@ -1,7 +1,7 @@
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import prettierPlugin from 'eslint-plugin-prettier';
-import prettierRecommended from 'eslint-plugin-prettier/recommended';
+import tseslint from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
+import prettierPlugin from 'eslint-plugin-prettier'
+import prettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default [
   {
@@ -47,4 +47,4 @@ export default [
     ignores: ['node_modules', 'dist', 'coverage', '*.js', '*.d.ts', 'k8s', 'logs'],
   },
   prettierRecommended,
-];
+]

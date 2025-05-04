@@ -2,48 +2,48 @@
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose, { Schema, model, models } from 'mongoose'
 
 interface ModelIndex {
-  fields: Record<string, any>;
-  options?: Record<string, any>;
+  fields: Record<string, any>
+  options?: Record<string, any>
 }
 
 // Base document interface
 export interface IBaseDocument extends mongoose.Document {
-  notes?: string;
-  sortNumber?: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-  createdByUserId: mongoose.Types.ObjectId | string;
-  updatedByUserId?: mongoose.Types.ObjectId | string;
-  deletedByUserId?: mongoose.Types.ObjectId | string;
-  canUpdate: boolean;
-  canDelete: boolean;
-  isExists: boolean;
+  notes?: string
+  sortNumber?: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+  deletedAt?: Date
+  createdByUserId: mongoose.Types.ObjectId | string
+  updatedByUserId?: mongoose.Types.ObjectId | string
+  deletedByUserId?: mongoose.Types.ObjectId | string
+  canUpdate: boolean
+  canDelete: boolean
+  isExists: boolean
 }
 
 export class Model {
   // ------------------------------
   // MODEL:
   // ------------------------------
-  protected ObjectId: typeof Schema.Types.ObjectId;
-  public Model!: mongoose.Model<IBaseDocument>;
-  protected name: string = '';
-  protected table: string = '';
-  protected searchs: string[] = [];
-  protected fields: Record<string, any> = {};
-  protected indexes?: ModelIndex[];
+  protected ObjectId: typeof Schema.Types.ObjectId
+  public Model!: mongoose.Model<IBaseDocument>
+  protected name: string = ''
+  protected table: string = ''
+  protected searchs: string[] = []
+  protected fields: Record<string, any> = {}
+  protected indexes?: ModelIndex[]
 
   constructor() {
-    this.ObjectId = Schema.Types.ObjectId;
+    this.ObjectId = Schema.Types.ObjectId
   }
 
   public run() {
-    this.Model = models[this.name] || model(this.name, this.ModelSchema());
-    return this;
+    this.Model = models[this.name] || model(this.name, this.ModelSchema())
+    return this
   }
 
   protected ModelSchema() {
@@ -65,14 +65,14 @@ export class Model {
         timestamps: true,
         id: false,
       },
-    );
+    )
 
     if (this.indexes && Array.isArray(this.indexes)) {
       this.indexes.forEach(index => {
-        schema.index(index.fields, index.options);
-      });
+        schema.index(index.fields, index.options)
+      })
     }
 
-    return schema;
+    return schema
   }
 }

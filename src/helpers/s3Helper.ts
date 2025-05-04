@@ -7,20 +7,20 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { s3Client, s3Config } from '../config/aws';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import createError from 'http-errors';
+} from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { s3Client, s3Config } from '../config/aws'
+import { v4 as uuidv4 } from 'uuid'
+import path from 'path'
+import createError from 'http-errors'
 
 class S3Helper {
-  private s3Client: any;
-  private bucketName: string;
+  private s3Client: any
+  private bucketName: string
 
   constructor() {
-    this.s3Client = s3Client;
-    this.bucketName = s3Config.bucketName || '';
+    this.s3Client = s3Client
+    this.bucketName = s3Config.bucketName || ''
   }
 
   /**
@@ -38,34 +38,34 @@ class S3Helper {
     // userId: string,
   ): Promise<Object> {
     try {
-      const fileExtension = path.extname(fileName).toLowerCase();
-      const isValidFileType = this._validateFileType(fileExtension, folder);
+      const fileExtension = path.extname(fileName).toLowerCase()
+      const isValidFileType = this._validateFileType(fileExtension, folder)
 
       if (!isValidFileType) {
-        throw createError(400, 'Geçersiz dosya tipi');
+        throw createError(400, 'Geçersiz dosya tipi')
       }
 
       if (fileBuffer.length > s3Config.maxFileSize) {
-        throw createError(400, 'File size exceeds limit');
+        throw createError(400, 'File size exceeds limit')
       }
 
-      const key = `${folder}/${uuidv4()}${fileExtension}`;
+      const key = `${folder}/${uuidv4()}${fileExtension}`
 
       const command = new PutObjectCommand({
         Bucket: this.bucketName,
         Key: key,
         Body: fileBuffer,
         ContentType: this._getContentType(fileExtension),
-      });
+      })
 
-      await this.s3Client.send(command);
+      await this.s3Client.send(command)
 
       return {
         key,
         bucket: this.bucketName,
-      };
+      }
     } catch (error: any) {
-      throw createError(error.statusCode || 500, error.message);
+      throw createError(error.statusCode || 500, error.message)
     }
   }
 
@@ -77,17 +77,17 @@ class S3Helper {
   async deleteFile(key: string): Promise<void> {
     try {
       if (!key || typeof key !== 'string') {
-        return;
+        return
       }
 
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      });
+      })
 
-      await this.s3Client.send(command);
+      await this.s3Client.send(command)
     } catch (error: any) {
-      throw createError(error.statusCode || 500, error.message);
+      throw createError(error.statusCode || 500, error.message)
     }
   }
 
@@ -105,14 +105,14 @@ class S3Helper {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      });
+      })
 
       const presignedUrl = await getSignedUrl(this.s3Client, command, {
         expiresIn: expires,
-      });
-      return presignedUrl;
+      })
+      return presignedUrl
     } catch (error: any) {
-      throw createError(error.statusCode || 500, error.message);
+      throw createError(error.statusCode || 500, error.message)
     }
   }
 
@@ -126,11 +126,11 @@ class S3Helper {
       const params = {
         Bucket: this.bucketName,
         Key: key,
-      };
+      }
 
-      return await this.s3Client.send(new HeadObjectCommand(params));
+      return await this.s3Client.send(new HeadObjectCommand(params))
     } catch (error: any) {
-      throw createError(error.statusCode || 500, error.message);
+      throw createError(error.statusCode || 500, error.message)
     }
   }
 
@@ -150,11 +150,11 @@ class S3Helper {
     folder: string,
   ): Promise<Object> {
     try {
-      await this.deleteFile(oldKey);
+      await this.deleteFile(oldKey)
 
-      return await this.uploadFile(fileBuffer, fileName, folder);
+      return await this.uploadFile(fileBuffer, fileName, folder)
     } catch (error: any) {
-      throw createError(error.statusCode || 500, error.message);
+      throw createError(error.statusCode || 500, error.message)
     }
   }
 
@@ -166,9 +166,9 @@ class S3Helper {
     const allowedTypes =
       folder === 'profiles'
         ? s3Config.allowedFileTypes.images
-        : [...s3Config.allowedFileTypes.images, ...s3Config.allowedFileTypes.documents];
+        : [...s3Config.allowedFileTypes.images, ...s3Config.allowedFileTypes.documents]
 
-    return allowedTypes.includes(extension.toLowerCase());
+    return allowedTypes.includes(extension.toLowerCase())
   }
 
   /**
@@ -206,13 +206,13 @@ class S3Helper {
       '.wmv': 'video/x-ms-wmv',
       '.flv': 'video/x-flv',
       '.swf': 'application/x-shockwave-flash',
-    };
-    return mimeTypes[extension.toLowerCase()] || 'application/octet-stream';
+    }
+    return mimeTypes[extension.toLowerCase()] || 'application/octet-stream'
   }
 }
 
-const s3Helper = new S3Helper();
+const s3Helper = new S3Helper()
 
-export default s3Helper;
+export default s3Helper
 
 /* -------------------------------------------------- */

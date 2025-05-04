@@ -1,4 +1,4 @@
-import systemSettings from './systemSettings';
+import systemSettings from './systemSettings'
 
 const CONSTANTS = {
   SYSTEM_LANGUAGES: {
@@ -73,6 +73,6 @@ const CONSTANTS = {
     ],
     RESOURCE_NOT_FOUND: [404, 'No data exists for the provided ID.'],
   },
-};
+}
 
-export default CONSTANTS;
+export default CONSTANTS

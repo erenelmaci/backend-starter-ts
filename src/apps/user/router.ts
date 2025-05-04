@@ -2,19 +2,19 @@
  * NODEJS PROJECT © 2024 - ITOPIATECH.COM.TR *
  ******************************************************* */
 
-import { Router } from 'express';
-import { user } from './controllers';
+import { Router } from 'express'
+import { user } from './controllers'
 
 /* -------------------------------------------------- */
 
-const router = Router();
+const router = Router()
 
 // CRUD Routes
-router.get('/', user.listMiddlewares, user.list);
-router.post('/', user.createMiddlewares, user.create);
-router.get('/:id', user.readMiddlewares, user.read);
-router.put('/:id', user.updateMiddlewares, user.update);
-router.delete('/:id', user.deleteUserMiddlewares, user.deleteUser);
+router.get('/', user.listMiddlewares, user.list)
+router.post('/', user.createMiddlewares, user.create)
+router.get('/:id', user.readMiddlewares, user.read)
+router.put('/:id', user.updateMiddlewares, user.update)
+router.delete('/:id', user.deleteUserMiddlewares, user.deleteUser)
 
 /* -------------------------------------------------- */
-export default router;
+export default router

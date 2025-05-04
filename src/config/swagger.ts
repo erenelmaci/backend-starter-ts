@@ -1,24 +1,24 @@
-import { Request, Response, Express } from 'express';
-import swaggerUi from 'swagger-ui-express';
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
+import { Request, Response, Express } from 'express'
+import swaggerUi from 'swagger-ui-express'
+import fs from 'fs'
+import path from 'path'
+import yaml from 'js-yaml'
 
-const packageJson = require(DIR + '/package.json');
+const packageJson = require(DIR + '/package.json')
 
 function getAllYamlFiles(dirPath: string, arrayOfFiles: string[] = []) {
-  const files = fs.readdirSync(dirPath);
+  const files = fs.readdirSync(dirPath)
 
   files.forEach(file => {
-    const fullPath = path.join(dirPath, file);
+    const fullPath = path.join(dirPath, file)
     if (fs.statSync(fullPath).isDirectory()) {
-      getAllYamlFiles(fullPath, arrayOfFiles);
+      getAllYamlFiles(fullPath, arrayOfFiles)
     } else if (fullPath.endsWith('.yaml')) {
-      arrayOfFiles.push(fullPath);
+      arrayOfFiles.push(fullPath)
     }
-  });
+  })
 
-  return arrayOfFiles;
+  return arrayOfFiles
 }
 
 function loadYamlFiles(files: string[]) {
@@ -59,22 +59,22 @@ function loadYamlFiles(files: string[]) {
       },
     ],
     paths: {},
-  };
+  }
 
   try {
     // Global YAML dosyasını oku
-    const globalYamlPath = path.join(DIR, 'src/routes/swagger.yaml');
+    const globalYamlPath = path.join(DIR, 'src/routes/swagger.yaml')
     if (fs.existsSync(globalYamlPath)) {
-      const globalYamlContent = fs.readFileSync(globalYamlPath, 'utf8');
-      const globalYamlData = yaml.load(globalYamlContent) as any;
+      const globalYamlContent = fs.readFileSync(globalYamlPath, 'utf8')
+      const globalYamlData = yaml.load(globalYamlContent) as any
 
       if (globalYamlData) {
         // Global verileri birleştir
         if (globalYamlData.components) {
-          Object.assign(swaggerSpec.components, globalYamlData.components);
+          Object.assign(swaggerSpec.components, globalYamlData.components)
         }
         if (globalYamlData.security) {
-          swaggerSpec.security = globalYamlData.security;
+          swaggerSpec.security = globalYamlData.security
         }
       }
     }
@@ -82,33 +82,33 @@ function loadYamlFiles(files: string[]) {
     // Modül bazlı YAML dosyalarını oku ve birleştir
     files.forEach(file => {
       try {
-        const yamlContent = fs.readFileSync(file, 'utf8');
-        const yamlData = yaml.load(yamlContent) as any;
+        const yamlContent = fs.readFileSync(file, 'utf8')
+        const yamlData = yaml.load(yamlContent) as any
 
         if (yamlData) {
           // Merge paths
           if (yamlData.paths) {
-            Object.assign(swaggerSpec.paths, yamlData.paths);
+            Object.assign(swaggerSpec.paths, yamlData.paths)
           }
 
           // Merge schemas
           if (yamlData.components && yamlData.components.schemas) {
-            Object.assign(swaggerSpec.components.schemas, yamlData.components.schemas);
+            Object.assign(swaggerSpec.components.schemas, yamlData.components.schemas)
           }
         }
       } catch (error) {
-        console.error(`Error loading YAML file ${file}:`, error);
+        console.error(`Error loading YAML file ${file}:`, error)
       }
-    });
+    })
   } catch (error) {
-    console.error('Error loading global YAML file:', error);
+    console.error('Error loading global YAML file:', error)
   }
 
-  return swaggerSpec;
+  return swaggerSpec
 }
 
-const yamlFiles = getAllYamlFiles(DIR + '/src/apps');
-const swaggerSpec = loadYamlFiles(yamlFiles);
+const yamlFiles = getAllYamlFiles(DIR + '/src/apps')
+const swaggerSpec = loadYamlFiles(yamlFiles)
 
 export const setupSwagger = (app: Express) => {
   app.use(
@@ -122,10 +122,10 @@ export const setupSwagger = (app: Express) => {
         persistAuthorization: true,
       },
     }),
-  );
+  )
 
   app.get(`${API_URL}/documents/json`, (req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(swaggerSpec);
-  });
-};
+    res.setHeader('Content-Type', 'application/json')
+    res.send(swaggerSpec)
+  })
+}

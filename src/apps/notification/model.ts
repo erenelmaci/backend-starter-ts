@@ -1,12 +1,12 @@
-import { IBaseDocument, Model } from '../../database/Model';
-import CONSTANTS from '../../config/constants';
+import { IBaseDocument, Model } from '../../database/Model'
+import CONSTANTS from '../../config/constants'
 
 export interface INotification extends IBaseDocument {}
 
 const Notification = new (class extends Model {
-  name = 'Notification';
-  table = 'notification';
-  searchs = ['userId', 'priority', 'message', 'isRead'];
+  name = 'Notification'
+  table = 'notification'
+  searchs = ['userId', 'priority', 'message', 'isRead']
   fields = {
     userId: {
       type: this.ObjectId,
@@ -41,11 +41,11 @@ const Notification = new (class extends Model {
       type: Number,
       default: null,
     },
-  };
-  listJoins = [{ path: 'userId', select: 'firstName lastName email image' }];
-  readJoins = [{ path: 'userId', select: SELECT_FIELDS }];
-})();
+  }
+  listJoins = [{ path: 'userId', select: 'firstName lastName email image' }]
+  readJoins = [{ path: 'userId', select: EXCLUDE_FIELDS }]
+})()
 
-Notification.run();
+Notification.run()
 
-export default Notification;
+export default Notification

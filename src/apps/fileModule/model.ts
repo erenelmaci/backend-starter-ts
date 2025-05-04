@@ -1,12 +1,12 @@
-import { IBaseDocument, Model } from '../../database/Model';
-import CONSTANTS from '../../config/constants';
+import { IBaseDocument, Model } from '../../database/Model'
+import CONSTANTS from '../../config/constants'
 
 export interface IFile extends IBaseDocument {}
 
 const File = new (class extends Model {
-  name = 'File';
-  table = 'file';
-  searchs = ['name', 'model', 'title', 'type'];
+  name = 'File'
+  table = 'file'
+  searchs = ['name', 'model', 'title', 'type']
   fields = {
     name: {
       type: String,
@@ -54,11 +54,11 @@ const File = new (class extends Model {
       type: Boolean,
       default: true,
     },
-  };
-  listJoins = [{ path: 'userId', select: 'firstName lastName email image' }];
-  readJoins = [{ path: 'userId', select: SELECT_FIELDS }];
-})();
+  }
+  listJoins = [{ path: 'userId', select: 'firstName lastName email image' }]
+  readJoins = [{ path: 'userId', select: EXCLUDE_FIELDS }]
+})()
 
-File.run();
+File.run()
 
-export default File;
+export default File

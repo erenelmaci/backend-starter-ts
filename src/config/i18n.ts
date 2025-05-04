@@ -1,7 +1,7 @@
-import i18next from 'i18next';
-import * as i18nextHttpMiddleware from 'i18next-http-middleware';
-import Backend from 'i18next-fs-backend';
-import path from 'path';
+import i18next from 'i18next'
+import * as i18nextHttpMiddleware from 'i18next-http-middleware'
+import Backend from 'i18next-fs-backend'
+import path from 'path'
 
 i18next
   .use(Backend)
@@ -23,6 +23,6 @@ i18next
       caches: ['cookie'],
     },
     debug: true,
-  });
+  })
 
-export default i18next;
+export default i18next

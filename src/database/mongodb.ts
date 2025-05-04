@@ -2,7 +2,7 @@
  * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
-import mongoose from './mongoose';
+import mongoose from './mongoose'
 
 /* -------------------------------------------------- */
 
@@ -12,16 +12,16 @@ import mongoose from './mongoose';
  */
 export const connectToMongoDB = async (): Promise<void> => {
   try {
-    const mongoURI = process.env.MONGO_URI;
+    const mongoURI = process.env.MONGO_URI
     if (!mongoURI) {
-      throw new Error('MONGO_URI environment variable is not defined');
+      throw new Error('MONGO_URI environment variable is not defined')
     }
-    await mongoose.connect(mongoURI);
-    console.log('\x1b[34m', 'MongoDB connected');
+    await mongoose.connect(mongoURI)
+    console.log('\x1b[34m', 'MongoDB connected')
   } catch (error) {
-    console.error('\x1b[31m', 'MongoDB connection error:', error);
-    process.exit(1);
+    console.error('\x1b[31m', 'MongoDB connection error:', error)
+    process.exit(1)
   }
-};
+}
 
 /* -------------------------------------------------- */

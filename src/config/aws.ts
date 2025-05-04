@@ -1,5 +1,5 @@
-import systemSettings from './systemSettings';
-import { S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import systemSettings from './systemSettings'
+import { S3Client, S3ClientConfig } from '@aws-sdk/client-s3'
 
 const s3ClientConfig: S3ClientConfig = {
   region: process.env.S3_REGION,
@@ -7,9 +7,9 @@ const s3ClientConfig: S3ClientConfig = {
     accessKeyId: process.env.S3_ACCESS_KEY as string,
     secretAccessKey: process.env.S3_SECRET_KEY as string,
   },
-};
+}
 
-const s3Client = new S3Client(s3ClientConfig);
+const s3Client = new S3Client(s3ClientConfig)
 
 // S3 Config
 
@@ -26,8 +26,8 @@ const s3Config = {
     profiles: 'profiles',
     documents: 'documents',
   },
-};
+}
 
-export { s3Config, s3Client };
+export { s3Config, s3Client }
 
 /* -------------------------------------------------- */

@@ -3,25 +3,25 @@
  ******************************************************* */
 /* -------------------------------------------------- */
 
-import { NextFunction, Request, Response } from 'express';
-import Joi from 'joi';
-import { SendError } from '../helpers/errorHandler';
+import { NextFunction, Request, Response } from 'express'
+import Joi from 'joi'
+import { SendError } from '../helpers/errorHandler'
 
 interface ValidationSchemas {
-  [key: string]: Joi.ObjectSchema;
+  [key: string]: Joi.ObjectSchema
 }
 
 interface ValidationError {
-  type: string;
-  statusCode: number;
-  message: string;
+  type: string
+  statusCode: number
+  message: string
 }
 
 interface ValidatableRequest {
-  body?: any;
-  params?: any;
-  query?: any;
-  [key: string]: any;
+  body?: any
+  params?: any
+  query?: any
+  [key: string]: any
 }
 
 export const validationMiddleware = (schemas: ValidationSchemas) => {
@@ -32,24 +32,24 @@ export const validationMiddleware = (schemas: ValidationSchemas) => {
           const validateData = await schema.validateAsync(req[source], {
             stripUnknown: true,
             abortEarly: false,
-          });
+          })
 
-          req[source] = validateData;
+          req[source] = validateData
         }
       }
-      next();
+      next()
     } catch (error: any) {
       const err: ValidationError = {
         type: 'Validation error',
         statusCode: 400,
         message: error.message,
-      };
+      }
 
-      throw new SendError('VALIDATION_ERROR', err.message);
+      throw new SendError('VALIDATION_ERROR', err.message)
     }
-  };
-};
+  }
+}
 
 /* -------------------------------------------------- */
 
-export default validationMiddleware;
+export default validationMiddleware
