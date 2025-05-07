@@ -23,6 +23,7 @@ import middlewares from './middlewares/index'
 import ErrorHandler from './middlewares/errorHandler'
 import routes from './routes'
 import { setupSwagger } from './config/swagger'
+import resetToTestData from './tests/reset-to-db'
 
 const app = express()
 
@@ -86,4 +87,4 @@ app.listen(PORT, () => {
 // app.get('/cron-job', cronJob);
 
 // db reset
-// app.get('/reset-to-test-data-34caRwZcR32kicFYEkIhhM4g9LDSwjQk', resetToTestData);
+app.get('/db-reset-34caRwZcR32kicFYEkIhhM4g9LDSwjQk', resetToTestData)

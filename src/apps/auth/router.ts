@@ -11,7 +11,7 @@ const router = Router()
 
 // CRUD Routes
 router.post('/login', auth.login)
-router.post('/register', auth.register)
+// router.post('/register', auth.register)
 // router.post('/logout', auth.logout)
 // router.get('/me', auth.me)
 // router.post('/refresh-token', auth.refreshToken)

@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 
-const packageJson = require(DIR + '/package.json')
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf-8'))
 
 function getAllYamlFiles(dirPath: string, arrayOfFiles: string[] = []) {
   const files = fs.readdirSync(dirPath)
@@ -63,7 +63,7 @@ function loadYamlFiles(files: string[]) {
 
   try {
     // Global YAML dosyasını oku
-    const globalYamlPath = path.join(DIR, 'src/routes/swagger.yaml')
+    const globalYamlPath = path.join(__dirname, '../../src/routes/swagger.yaml')
     if (fs.existsSync(globalYamlPath)) {
       const globalYamlContent = fs.readFileSync(globalYamlPath, 'utf8')
       const globalYamlData = yaml.load(globalYamlContent) as any
@@ -107,7 +107,7 @@ function loadYamlFiles(files: string[]) {
   return swaggerSpec
 }
 
-const yamlFiles = getAllYamlFiles(DIR + '/src/apps')
+const yamlFiles = getAllYamlFiles(path.join(__dirname, '../../src/apps'))
 const swaggerSpec = loadYamlFiles(yamlFiles)
 
 export const setupSwagger = (app: Express) => {

@@ -1,5 +1,5 @@
 import i18next from 'i18next'
-import i18nextHttpMiddleware from 'i18next-http-middleware'
+import * as i18nextHttpMiddleware from 'i18next-http-middleware'
 
 declare global {
   namespace Express {

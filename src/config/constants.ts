@@ -12,7 +12,6 @@ const CONSTANTS = {
   USER_ROLES: {
     ADMIN: 'admin',
     USER: 'user',
-    GUEST: 'guest',
   },
   S3_PATHS: {
     PROFILE: 'profiles',
@@ -29,6 +28,7 @@ const CONSTANTS = {
     AUTH_PASSIVE_SERVICE: [401, 'This login method is not active. Try again later.'],
     AUTH_OAUTH_FAILED: [401, 'Login with external authentication failed.'],
     AUTH_BLANK_DATA: [401, 'Please Sign In'],
+    EMAIL_ALREADY_EXISTS: [409, 'This email is already registered.'],
     AUTH_WRONG_DATA: [401, 'Wrong email or password.'],
     AUTH_PASSIVE_USER: [401, 'This account is not active.'],
     AUTH_WRONG_TOKEN: [401, 'Wrong Token.', 'Authorizaton info not found in headers.'],

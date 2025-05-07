@@ -5,7 +5,7 @@ interface CustomError extends Error {
   errorCode?: string
   code?: string
   missingFields?: string[]
-  cause?: string
+  cause?: any
 }
 
 interface ErrorData {
