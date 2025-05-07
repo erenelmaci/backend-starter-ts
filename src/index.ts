@@ -1,5 +1,5 @@
 /* *******************************************************
- * NODEJS PROJECT © 2024 - BURSAYAZİLİMEVİ.COM *
+ * NODEJS PROJECT © 2025 - BURSAYAZİLİMEVİ.COM *
  ******************************************************* */
 
 import express, { NextFunction, Request, Response } from 'express'

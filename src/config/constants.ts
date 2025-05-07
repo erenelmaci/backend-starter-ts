@@ -28,7 +28,7 @@ const CONSTANTS = {
     // Auth & Profile:
     AUTH_PASSIVE_SERVICE: [401, 'This login method is not active. Try again later.'],
     AUTH_OAUTH_FAILED: [401, 'Login with external authentication failed.'],
-    AUTH_BLANK_DATA: [401, 'Please, enter email and password.'],
+    AUTH_BLANK_DATA: [401, 'Please Sign In'],
     AUTH_WRONG_DATA: [401, 'Wrong email or password.'],
     AUTH_PASSIVE_USER: [401, 'This account is not active.'],
     AUTH_WRONG_TOKEN: [401, 'Wrong Token.', 'Authorizaton info not found in headers.'],

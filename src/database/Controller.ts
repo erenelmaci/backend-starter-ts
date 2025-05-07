@@ -42,8 +42,6 @@ export const db = {
     const page = Math.max(1, Number(pageRaw) || 1)
     const limit = Math.max(1, Number(limitRaw) || 20)
 
-    console.log('Query Params:', { page, limit, queryParams })
-
     // ------------------------------
     //! FILTER: Supports operators like gt, gte, lt, lte, ne, eq, regex, in, nin
     // ------------------------------
@@ -129,8 +127,6 @@ export const db = {
     const currentPage = Math.min(page, totalPages > 0 ? totalPages : 1)
     const skip = total > 0 ? (currentPage - 1) * limitNumber : 0
 
-    console.log('Pagination:', { currentPage, totalPages, skip, limitNumber })
-
     // ------------------------------
     //! DATABASE QUERY: Find with pagination
     // ------------------------------
@@ -155,8 +151,6 @@ export const db = {
     } else {
       pages = false
     }
-
-    console.log(currentPage)
 
     // ------------------------------
     //! URL GENERATION: Rebuild query string for info

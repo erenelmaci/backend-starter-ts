@@ -3,9 +3,10 @@ import User from './model'
 import { isUserHasPermission, isUserLogin } from '../../middlewares/Permissions'
 import { db } from '../../database/Controller'
 import encryptPassword from '../../helpers/encryptPassword'
+import CONSTANTS from '../../config/constants'
 
 export const user = {
-  listMiddlewares: [],
+  listMiddlewares: [isUserLogin(), isUserHasPermission([CONSTANTS.USER_ROLES.ADMIN, 'read'])],
 
   list: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -15,7 +16,7 @@ export const user = {
       next(error)
     }
   },
-  createMiddlewares: [isUserLogin(), isUserHasPermission([global.ROLES.ADMIN, 'create'])],
+  createMiddlewares: [isUserLogin(), isUserHasPermission([CONSTANTS.USER_ROLES.ADMIN, 'create'])],
 
   create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -30,7 +31,7 @@ export const user = {
       next(error)
     }
   },
-  readMiddlewares: [isUserLogin(), isUserHasPermission([global.ROLES.USER, 'read'])],
+  readMiddlewares: [isUserLogin(), isUserHasPermission([CONSTANTS.USER_ROLES.ADMIN, 'read'])],
 
   read: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -45,7 +46,7 @@ export const user = {
     }
   },
 
-  updateMiddlewares: [isUserLogin(), isUserHasPermission([global.ROLES.USER, 'update'])],
+  updateMiddlewares: [isUserLogin(), isUserHasPermission([CONSTANTS.USER_ROLES.ADMIN, 'update'])],
 
   update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -60,7 +61,10 @@ export const user = {
     }
   },
 
-  deleteUserMiddlewares: [isUserLogin(), isUserHasPermission([global.ROLES.USER, 'delete'])],
+  deleteUserMiddlewares: [
+    isUserLogin(),
+    isUserHasPermission([CONSTANTS.USER_ROLES.ADMIN, 'delete']),
+  ],
 
   deleteUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

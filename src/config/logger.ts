@@ -3,16 +3,8 @@ import winston from 'winston'
 
 const logPath = path.join(__dirname, '../../logs')
 
-const logFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.printf(({ timestamp, level, message, ...metadata }) => {
-    let log = `${timestamp} [${level}]: ${message}`
-    if (metadata) {
-      log += ` | ${JSON.stringify(metadata)}`
-    }
-    return log
-  }),
-)
+// JSON formatlı log
+const logFormat = winston.format.combine(winston.format.timestamp(), winston.format.json())
 
 const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
@@ -26,7 +18,7 @@ const logger = winston.createLogger({
 if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
-      format: winston.format.simple(),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
   )
 }
