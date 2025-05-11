@@ -68,7 +68,7 @@ export const user = {
 
   deleteUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await db.remove(User.Model, req.params.id)
+      const result = await db.remove(User.Model, { _id: req.params.id })
       if (!result) {
         view(res, 404, { message: 'User not found' })
         return

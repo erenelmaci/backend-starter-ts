@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   {
     emailLanguage: 'tr',
     emailTemplate: '{{content}}',

@@ -228,9 +228,9 @@ export const db = {
     return model.findByIdAndUpdate(id, { ...data, updatedAt: new Date() }, { new: true })
   },
 
-  remove: async <T extends IBaseDocument>(model: Model<T>, id: string): Promise<any> => {
+  remove: async <T extends IBaseDocument>(model: Model<T>, query: object): Promise<any> => {
     const removedData = await model.findByIdAndUpdate(
-      id,
+      query,
       {
         isExists: false,
         deletedAt: new Date(),

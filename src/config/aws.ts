@@ -4,8 +4,8 @@ import { S3Client, S3ClientConfig } from '@aws-sdk/client-s3'
 const s3ClientConfig: S3ClientConfig = {
   region: process.env.S3_REGION,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY as string,
-    secretAccessKey: process.env.S3_SECRET_KEY as string,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
   },
 }
 
@@ -16,7 +16,7 @@ const s3Client = new S3Client(s3ClientConfig)
 const s3Config = {
   bucketName: process.env.S3_BUCKET_NAME,
   region: process.env.S3_REGION,
-  signedUrlExpireSeconds: 60 * 60 * 24, // 1 gün
+  signedUrlExpireSeconds: 60 * 60 * 24, // 1 day
   allowedFileTypes: {
     images: ['.jpg', '.jpeg', '.png', '.gif'],
     documents: ['.pdf', '.doc', '.docx', '.txt'],

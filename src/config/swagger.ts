@@ -62,14 +62,14 @@ function loadYamlFiles(files: string[]) {
   }
 
   try {
-    // Global YAML dosyasını oku
+    // Read the global YAML file
     const globalYamlPath = path.join(__dirname, '../../src/routes/swagger.yaml')
     if (fs.existsSync(globalYamlPath)) {
       const globalYamlContent = fs.readFileSync(globalYamlPath, 'utf8')
       const globalYamlData = yaml.load(globalYamlContent) as any
 
       if (globalYamlData) {
-        // Global verileri birleştir
+        // Merge global data
         if (globalYamlData.components) {
           Object.assign(swaggerSpec.components, globalYamlData.components)
         }
@@ -79,7 +79,7 @@ function loadYamlFiles(files: string[]) {
       }
     }
 
-    // Modül bazlı YAML dosyalarını oku ve birleştir
+    // Read and merge module-specific YAML files
     files.forEach(file => {
       try {
         const yamlContent = fs.readFileSync(file, 'utf8')
