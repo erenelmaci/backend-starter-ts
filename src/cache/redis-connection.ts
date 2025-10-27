@@ -5,7 +5,7 @@ class RedisConnection {
   private client: Redis | null = null
   private isConnected: boolean = false
 
-  // private constructor() {}
+  private constructor() {}
 
   public static getInstance(): RedisConnection {
     if (!RedisConnection.instance) {

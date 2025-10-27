@@ -1,61 +1,96 @@
 import jwt from 'jsonwebtoken'
-import { redisConnection } from '../cache/redis-connection'
 import User, { IUser } from '../apps/user/model'
 import { db } from '../database/Controller'
+import { SessionManager } from './SessionManager'
 
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not defined')
 }
 
 const JWT_SECRET = process.env.JWT_SECRET
-const SESSION_EXPIRY = 24 * 60 * 60 // 24H
-const redis = redisConnection.getClient()
 
-export const generateToken = async (user: IUser) => {
+export const generateToken = async (user: IUser, userAgent?: string, ip?: string) => {
   const token = jwt.sign(
     {
       userId: user._id,
       email: user.email,
       role: user.role,
+      iat: Math.floor(Date.now() / 1000), // Issued at
+      jti: `${user._id}_${Date.now()}`, // JWT ID - unique token identifier
     },
     JWT_SECRET,
     { expiresIn: '24h' },
   )
 
-  await redis.setex(
-    `auth:${token}`,
-    SESSION_EXPIRY,
-    JSON.stringify({
-      userId: user._id,
-      email: user.email,
-      role: user.role,
-    }),
-  )
+  // Session bilgilerini Redis'e kaydet
+  const sessionData = {
+    userId: (user._id as any).toString(),
+    email: user.email,
+    role: user.role,
+    userAgent: userAgent || 'unknown',
+    ip: ip || 'unknown',
+    createdAt: new Date().toISOString(),
+    lastActivity: new Date().toISOString(),
+    isActive: true,
+  }
+
+  await SessionManager.createSession(token, sessionData)
 
   return token
 }
 
-export const validateToken = async (token: string) => {
+export const validateToken = async (token: string, userAgent?: string, ip?: string) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
       userId: string
       email: string
       role: string
+      iat: number
+      jti: string
     }
 
-    const sessionData = await redis.get(`auth:${token}`)
-
-    if (!sessionData) {
+    // Session'ı Redis'den al
+    const session = await SessionManager.getSession(token)
+    if (!session) {
       return null
     }
+
+    // Session güvenlik kontrolü
+    const isSecure = await SessionManager.validateSessionSecurity(token, userAgent, ip)
+    if (!isSecure) {
+      return null
+    }
+
+    // Session'ı yenile (lastActivity güncelle)
+    await SessionManager.refreshSession(token)
 
     const user = await db.read(User.Model, { _id: decoded.userId })
     return user
   } catch (error) {
-    return error
+    return null
   }
 }
 
 export const invalidateToken = async (token: string) => {
-  await redis.del(`auth:${token}`)
+  await SessionManager.invalidateSession(token)
+}
+
+// User'ın tüm session'larını geçersiz kıl
+export const invalidateAllUserSessions = async (userId: string) => {
+  await SessionManager.invalidateAllUserSessions(userId)
+}
+
+// Session istatistikleri
+export const getSessionStats = async () => {
+  return await SessionManager.getSessionStats()
+}
+
+// User'ın aktif session sayısı
+export const getUserSessionCount = async (userId: string) => {
+  return await SessionManager.getUserSessionCount(userId)
+}
+
+// User'ın aktif session'ları
+export const getUserSessions = async (userId: string) => {
+  return await SessionManager.getUserSessions(userId)
 }

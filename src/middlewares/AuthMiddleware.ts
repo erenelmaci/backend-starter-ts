@@ -19,23 +19,26 @@ export const AuthMiddleware = async (
   next: NextFunction,
 ) => {
   try {
-    const token = (req.headers as any).authorization?.split(' ')[1]
+    // Token'ı hem header'dan hem cookie'den al
+    const headerToken = (req.headers as any).authorization?.split(' ')[1]
+    const cookieToken = req.cookies?.token
+
+    const token = headerToken || cookieToken
 
     if (!token) {
       return res.status(401).json({ message: 'Token bulunamadı' })
     }
 
-    const decoded = await validateToken(token)
-    if (!decoded) {
+    // Client bilgilerini al
+    const userAgent = req.headers['user-agent'] || 'unknown'
+    const ip = req.ip || req.connection.remoteAddress || 'unknown'
+
+    const user = await validateToken(token, userAgent, ip)
+    if (!user) {
       return res.status(401).json({ message: 'Geçersiz token' })
     }
 
-    const user = await db.read(User.Model, { _id: decoded })
-    if (!user) {
-      return res.status(401).json({ message: 'Kullanıcı bulunamadı' })
-    }
-
-    req.user = user as unknown as RedisUserModel
+    req.user = user as IUser
     next()
   } catch (error) {
     console.error('Auth middleware error:', error)

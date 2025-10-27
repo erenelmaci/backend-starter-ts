@@ -3,16 +3,20 @@
  ******************************************************* */
 
 import { Router } from 'express'
+import { rateLimitConfigs } from '../../middlewares/Security'
 import auth from './controllers'
 
 /* -------------------------------------------------- */
 
 const router = Router()
 
-// CRUD Routes
-router.post('/login', auth.login)
-// router.post('/register', auth.register)
-// router.post('/logout', auth.logout)
+// Auth endpoints için özel rate limiting
+router.use(rateLimitConfigs.auth)
+
+// Auth Routes
+router.post('/login', auth.loginMiddlewares, auth.login)
+router.post('/register', auth.registerMiddlewares, auth.register)
+router.post('/logout', auth.logoutMiddlewares, auth.logout)
 // router.get('/me', auth.me)
 // router.post('/refresh-token', auth.refreshToken)
 // router.post('/forgot-password', auth.forgotPassword)

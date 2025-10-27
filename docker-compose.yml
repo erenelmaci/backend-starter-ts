@@ -4,14 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '8000:8000'
+      - "8000:8000"
     environment:
       - NODE_ENV=production
     env_file:
       - .env.production
     volumes:
       - .:/user/src/app:rw
-    command: ['npm', 'start']
+    command: ["npm", "start"]
     depends_on:
       - rabbitmq
       - redis
@@ -19,9 +19,12 @@ services:
     image: redis:7.0-alpine
     container_name: redis
     ports:
-      - '6379:6379'
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --appendfsync everysec
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       retries: 3
       start_period: 5s
@@ -31,11 +34,14 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - '15672:15672' # RabbitMQ Management UI
-      - '5672:5672' # RabbitMQ Port
+      - "15672:15672" # RabbitMQ Management UI
+      - "5672:5672" # RabbitMQ Port
     healthcheck:
-      test: ['CMD', 'rabbitmqctl', 'status']
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
       retries: 3
       start_period: 5s
       timeout: 2s
+
+volumes:
+  redis_data:

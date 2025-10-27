@@ -30,11 +30,37 @@ export const emailTemplate = {
     }
   },
 
+  createMiddlewares: [isUserLogin(), isUserHasPermission(['emailTemplate', 'create'])],
+
+  create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await db.create(EmailTemplate.Model, req.body)
+      view(res, 201, result)
+    } catch (error) {
+      next(error)
+    }
+  },
+
   updateMiddlewares: [isUserLogin(), isUserHasPermission(['emailTemplate', 'update'])],
 
   update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await db.update(EmailTemplate.Model, req.params.id, req.body)
+      if (!result) {
+        view(res, 404, { message: 'Email template not found' })
+        return
+      }
+      view(res, 200, result as Record<string, any>)
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  deleteMiddlewares: [isUserLogin(), isUserHasPermission(['emailTemplate', 'delete'])],
+
+  delete: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await db.remove(EmailTemplate.Model, { _id: req.params.id })
       if (!result) {
         view(res, 404, { message: 'Email template not found' })
         return

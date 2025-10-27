@@ -56,6 +56,7 @@ const CONSTANTS = {
     // Permissions:
     NO_LOGIN: [401, 'It must be logged user.'],
     NO_PERMISSION: [401, 'It must be has permission for this process.'],
+    AUTH_NO_PERMISSION: [401, 'It must be has permission for this process.'],
     // Upload:
     FILE_NOT_FOUND: [404, 'There is not any file for upload process.'],
     FILE_DISALLOW: [400, 'This file (or filetype) not allowed for upload.'],
