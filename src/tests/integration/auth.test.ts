@@ -144,7 +144,7 @@ describe('Authentication Integration Tests', () => {
       // Login
       const loginResponse = await request(app).post('/api/auth/login').send(loginData).expect(200)
 
-      const token = loginResponse.body.token
+      const _token = loginResponse.body.token
 
       // Session stats kontrolü
       const statsResponse = await request(app)

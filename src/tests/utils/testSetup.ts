@@ -54,7 +54,7 @@ afterEach(async () => {
         await collection.deleteMany({})
       }
     }
-  } catch (error) {
+  } catch {
     // MongoDB cleanup failed, continue
   }
 })
@@ -65,7 +65,7 @@ afterAll(async () => {
     if (mongoose.connection.readyState === 1) {
       await mongoose.connection.close()
     }
-  } catch (error) {
+  } catch {
     // MongoDB disconnect failed, continue
   }
 })
